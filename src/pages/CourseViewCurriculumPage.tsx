@@ -12,7 +12,7 @@ import {
   Play,
   FileText,
   CheckCircle,
-  LockClosed,
+  Lock,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -477,7 +477,7 @@ const CourseViewCurriculumPage = () => {
 
   const renderLessonIcon = (type: string, isCompleted: boolean | undefined, isLocked: boolean) => {
     if (isLocked) {
-      return <LockClosed className="h-5 w-5 text-muted-foreground" />;
+      return <Lock className="h-5 w-5 text-muted-foreground" />;
     }
     
     if (isCompleted) {
