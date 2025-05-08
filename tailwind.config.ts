@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        brand: {
+          yellow: "#F7B32B",
+          red: "#ea384c",
+          green: "#4CAF50",
+          dark: "#1A1F2C",
+          light: "#FFFFFF"
+        }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +92,54 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        'fade-in': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          }
+        },
+        'scale-in': {
+          '0%': {
+            transform: 'scale(0.95)',
+            opacity: '0'
+          },
+          '100%': {
+            transform: 'scale(1)',
+            opacity: '1'
+          }
+        },
+        'slide-in': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' }
+        },
+        'pulse-glow': {
+          '0%, 100%': { 
+            opacity: '1',
+            boxShadow: '0 0 0 0 rgba(247, 179, 43, 0.7)' 
+          },
+          '50%': { 
+            opacity: '0.8',
+            boxShadow: '0 0 0 10px rgba(247, 179, 43, 0)'
+          }
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in': 'fade-in 0.5s ease-out forwards',
+        'scale-in': 'scale-in 0.3s ease-out forwards',
+        'slide-in': 'slide-in 0.5s ease-out forwards',
+        'pulse-glow': 'pulse-glow 2s infinite'
+			},
+      fontFamily: {
+        'playfair': ['"Playfair Display"', 'serif'],
+        'inter': ['Inter', 'sans-serif']
+      },
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
