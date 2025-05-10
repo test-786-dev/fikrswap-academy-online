@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Courses
@@ -122,30 +121,48 @@ export const getSession = async () => {
 
 // Social Authentication
 export const signInWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/auth-callback`,
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth-callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
       }
+    });
+    
+    if (error) {
+      console.error("Google OAuth error:", error);
+      throw error;
     }
-  });
-  
-  if (error) throw error;
-  return data;
+    
+    return data;
+  } catch (error) {
+    console.error("Failed to sign in with Google:", error);
+    throw error;
+  }
 };
 
 export const signInWithFacebook = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'facebook',
-    options: {
-      redirectTo: `${window.location.origin}/auth-callback`,
-      scopes: 'email,public_profile'
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        redirectTo: `${window.location.origin}/auth-callback`,
+        scopes: 'email,public_profile'
+      }
+    });
+    
+    if (error) {
+      console.error("Facebook OAuth error:", error);
+      throw error;
     }
-  });
-  
-  if (error) throw error;
-  return data;
+    
+    return data;
+  } catch (error) {
+    console.error("Failed to sign in with Facebook:", error);
+    throw error;
+  }
 };
