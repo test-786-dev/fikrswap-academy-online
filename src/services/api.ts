@@ -84,3 +84,28 @@ export const updateUserProfile = async (userId: string, profileData: any) => {
   if (error) throw error;
   return data;
 };
+
+// Authentication
+export const signInWithGoogle = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin
+    }
+  });
+  
+  if (error) throw error;
+  return data;
+};
+
+export const signInWithFacebook = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'facebook',
+    options: {
+      redirectTo: window.location.origin
+    }
+  });
+  
+  if (error) throw error;
+  return data;
+};

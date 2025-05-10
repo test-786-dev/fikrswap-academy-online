@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { signInWithGoogle, signInWithFacebook } from "@/services/api";
 
 interface AuthContextType {
   session: Session | null;
@@ -12,6 +13,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signInWithFacebook: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -102,6 +105,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const handleSignInWithGoogle = async () => {
+    try {
+      setLoading(true);
+      await signInWithGoogle();
+    } catch (error: any) {
+      toast({
+        title: "Error signing in with Google",
+        description: error.message,
+        variant: "destructive",
+      });
+      console.error("Error signing in with Google:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleSignInWithFacebook = async () => {
+    try {
+      setLoading(true);
+      await signInWithFacebook();
+    } catch (error: any) {
+      toast({
+        title: "Error signing in with Facebook",
+        description: error.message,
+        variant: "destructive",
+      });
+      console.error("Error signing in with Facebook:", error);
+      setLoading(false);
+    }
+  };
+
   const signOut = async () => {
     try {
       setLoading(true);
@@ -126,7 +159,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, signUp, signIn, signOut, loading }}>
+    <AuthContext.Provider value={{ 
+      session, 
+      user, 
+      signUp, 
+      signIn, 
+      signOut, 
+      loading, 
+      signInWithGoogle: handleSignInWithGoogle, 
+      signInWithFacebook: handleSignInWithFacebook 
+    }}>
       {children}
     </AuthContext.Provider>
   );
