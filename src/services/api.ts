@@ -86,11 +86,50 @@ export const updateUserProfile = async (userId: string, profileData: any) => {
 };
 
 // Authentication
+export const signInWithEmail = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  
+  if (error) throw error;
+  return data;
+};
+
+export const signUpWithEmail = async (email: string, password: string, metadata?: { [key: string]: any }) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: metadata,
+    },
+  });
+  
+  if (error) throw error;
+  return data;
+};
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+};
+
+export const getSession = async () => {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  return data.session;
+};
+
+// Social Authentication
 export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin
+      redirectTo: `${window.location.origin}/auth-callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      }
     }
   });
   
@@ -102,7 +141,8 @@ export const signInWithFacebook = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'facebook',
     options: {
-      redirectTo: window.location.origin
+      redirectTo: `${window.location.origin}/auth-callback`,
+      scopes: 'email,public_profile'
     }
   });
   

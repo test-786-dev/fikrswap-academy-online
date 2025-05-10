@@ -4,7 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithGoogle, signInWithFacebook } from "@/services/api";
+import { 
+  signInWithEmail, 
+  signUpWithEmail, 
+  signOut as apiSignOut,
+  signInWithGoogle as apiSignInWithGoogle,
+  signInWithFacebook as apiSignInWithFacebook
+} from "@/services/api";
 
 interface AuthContextType {
   session: Session | null;
@@ -29,17 +35,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log("Auth state changed:", event, session);
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
       setLoading(false);
     });
 
@@ -49,15 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, metadata?: { [key: string]: any }) => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: metadata,
-        }
-      });
-
-      if (error) throw error;
+      await signUpWithEmail(email, password, metadata);
       
       toast({
         title: "Account created!",
@@ -80,12 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      await signInWithEmail(email, password);
       
       toast({
         title: "Welcome back!",
@@ -108,7 +101,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleSignInWithGoogle = async () => {
     try {
       setLoading(true);
-      await signInWithGoogle();
+      await apiSignInWithGoogle();
+      // Redirect happens automatically via Supabase
     } catch (error: any) {
       toast({
         title: "Error signing in with Google",
@@ -123,7 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleSignInWithFacebook = async () => {
     try {
       setLoading(true);
-      await signInWithFacebook();
+      await apiSignInWithFacebook();
+      // Redirect happens automatically via Supabase
     } catch (error: any) {
       toast({
         title: "Error signing in with Facebook",
@@ -138,8 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await apiSignOut();
       
       toast({
         title: "Logged out successfully",

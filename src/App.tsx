@@ -16,6 +16,7 @@ import ContactPage from "./pages/ContactPage";
 import LiveClassPage from "./pages/LiveClassPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
 import DashboardPage from "./pages/DashboardPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import NotFound from "./pages/NotFound";
@@ -60,11 +61,6 @@ const AuthRedirectHandler = ({ children }: { children: React.ReactNode }) => {
     if (user && (location.pathname === '/login' || location.pathname === '/signup')) {
       navigate('/');
     }
-    
-    // Handle potential OAuth redirect with fragment identifier
-    if (location.hash && location.hash.includes('access_token')) {
-      console.log('Auth redirect detected');
-    }
   }, [user, loading, navigate, location]);
   
   return <>{children}</>;
@@ -98,6 +94,7 @@ const App = () => (
                 } />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth-callback" element={<AuthCallbackPage />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <DashboardPage />
