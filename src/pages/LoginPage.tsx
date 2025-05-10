@@ -1,16 +1,14 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FloralPattern } from "@/components/FloralPattern";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginPage = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const { signIn, loading } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -19,7 +17,6 @@ const LoginPage = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -52,29 +49,11 @@ const LoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      setIsSubmitting(true);
-      
-      // Simulate API call
-      setTimeout(() => {
-        // For demo purposes, always succeed login
-        localStorage.setItem("user", JSON.stringify({
-          email: formData.email,
-          isLoggedIn: true
-        }));
-        
-        toast({
-          title: "Login successful!",
-          description: "Welcome back to FikrSwap Academy.",
-        });
-        
-        // Redirect to homepage/dashboard
-        navigate("/");
-        setIsSubmitting(false);
-      }, 1500);
+      await signIn(formData.email, formData.password);
     }
   };
 
@@ -185,10 +164,10 @@ const LoginPage = () => {
             <div>
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={loading}
                 className="w-full bg-brand-yellow text-brand-dark hover:bg-yellow-500"
               >
-                {isSubmitting ? "Signing in..." : "Sign in"}
+                {loading ? "Signing in..." : "Sign in"}
               </Button>
             </div>
           </motion.form>

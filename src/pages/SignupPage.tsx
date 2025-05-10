@@ -1,16 +1,14 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FloralPattern } from "@/components/FloralPattern";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const SignupPage = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const { signUp, loading } = useAuth();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -21,7 +19,6 @@ const SignupPage = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -70,30 +67,19 @@ const SignupPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      setIsSubmitting(true);
+      // Split the full name into first and last name
+      const nameParts = formData.fullName.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
       
-      // Simulate API call
-      setTimeout(() => {
-        // Store user data in localStorage
-        localStorage.setItem("user", JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          isLoggedIn: true
-        }));
-        
-        toast({
-          title: "Account created!",
-          description: "Welcome to FikrSwap Academy. Your account has been created successfully.",
-        });
-        
-        // Redirect to dashboard
-        navigate("/");
-        setIsSubmitting(false);
-      }, 1500);
+      await signUp(formData.email, formData.password, {
+        first_name: firstName,
+        last_name: lastName || ''
+      });
     }
   };
 
@@ -253,10 +239,10 @@ const SignupPage = () => {
             <div>
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={loading}
                 className="w-full bg-brand-yellow text-brand-dark hover:bg-yellow-500"
               >
-                {isSubmitting ? "Creating Account..." : "Sign up"}
+                {loading ? "Creating Account..." : "Sign up"}
               </Button>
             </div>
           </motion.form>

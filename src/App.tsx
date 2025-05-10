@@ -19,8 +19,17 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import NotFound from "./pages/NotFound";
+import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
+
+const AppWithProviders = () => (
+  <BrowserRouter>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </BrowserRouter>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,31 +37,29 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-grow pt-16">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/courses" element={<CoursesPage />} />
-                <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-                <Route path="/courses/:courseId/curriculum" element={<CourseViewCurriculumPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/live-classes" element={<LiveClassPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/404" element={<NotFoundPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </BrowserRouter>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="flex-grow pt-16">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/courses" element={<CoursesPage />} />
+              <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+              <Route path="/courses/:courseId/curriculum" element={<CourseViewCurriculumPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/live-classes" element={<LiveClassPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/404" element={<NotFoundPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
 
-export default App;
+export default AppWithProviders;
