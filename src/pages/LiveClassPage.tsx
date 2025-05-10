@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -424,12 +425,7 @@ const LiveClassPage = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="pt-16"
-    >
+    <div className="pt-16">
       {/* Live Class Header */}
       <section className="relative py-12 overflow-hidden bg-muted/30">
         <FloralPattern className="opacity-20" />
@@ -459,10 +455,227 @@ const LiveClassPage = () => {
               <TabsTrigger value="my-classes">My Classes</TabsTrigger>
               <TabsTrigger value="host">Host a Class</TabsTrigger>
             </TabsList>
-          
-            {/* Live Class Content */}
-            {isInClass ? (
-              <section className="py-12 bg-muted/10">
+            
+            {/* Tabs Content - Using TabsContent for each tab value */}
+            {!isInClass ? (
+              <>
+                <TabsContent value="upcoming">
+                  {/* Upcoming classes content */}
+                  <div className="space-y-6">
+                    <div className="mb-6">
+                      <Select value={filterCategory} onValueChange={setFilterCategory}>
+                        <SelectTrigger className="w-full sm:w-[200px]">
+                          <SelectValue placeholder="Filter by category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem key={category.value} value={category.value}>{category.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredClasses.map((cls) => (
+                        <Card key={cls.id} className="overflow-hidden">
+                          <div className="aspect-video relative overflow-hidden">
+                            <img 
+                              src={cls.coverImage} 
+                              alt={cls.title}
+                              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                              <div>
+                                <h3 className="text-white font-semibold text-lg">{cls.title}</h3>
+                                <p className="text-white/80 text-sm">{cls.instructor}</p>
+                              </div>
+                            </div>
+                            {cls.category && (
+                              <Badge className="absolute top-3 right-3 bg-brand-yellow text-brand-dark">{cls.category}</Badge>
+                            )}
+                          </div>
+                          
+                          <CardContent className="pt-4">
+                            <div className="flex justify-between items-center mb-4">
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Calendar className="h-4 w-4" />
+                                <span>{cls.date}</span>
+                              </div>
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Clock className="h-4 w-4" />
+                                <span>{cls.time}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                          
+                          <CardFooter className="border-t pt-4">
+                            <Button 
+                              onClick={() => handleJoinClass(cls.id)} 
+                              className="w-full bg-brand-yellow hover:bg-yellow-500 text-brand-dark"
+                            >
+                              <Play className="mr-2 h-4 w-4" />
+                              Join Class
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="my-classes">
+                  {/* My Classes Tab Content */}
+                  {myClasses.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {myClasses.map((cls) => (
+                        <Card key={cls.id} className="overflow-hidden">
+                          <div className="aspect-video relative overflow-hidden">
+                            <img 
+                              src={cls.coverImage} 
+                              alt={cls.title}
+                              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                              <div>
+                                <h3 className="text-white font-semibold text-lg">{cls.title}</h3>
+                                <p className="text-white/80 text-sm">{cls.instructor}</p>
+                              </div>
+                            </div>
+                            {cls.category && (
+                              <Badge className="absolute top-3 right-3 bg-brand-yellow text-brand-dark">{cls.category}</Badge>
+                            )}
+                          </div>
+                          
+                          <CardContent className="pt-4">
+                            <div className="flex justify-between items-center mb-4">
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Calendar className="h-4 w-4" />
+                                <span>{cls.date}</span>
+                              </div>
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Clock className="h-4 w-4" />
+                                <span>{cls.time}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                          
+                          <CardFooter className="border-t pt-4">
+                            <Button 
+                              onClick={() => handleJoinClass(cls.id)} 
+                              className="w-full bg-brand-yellow hover:bg-yellow-500 text-brand-dark"
+                            >
+                              <Play className="mr-2 h-4 w-4" />
+                              Join Class
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                        <Calendar className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-lg font-medium mb-2">No classes yet</h3>
+                      <p className="text-muted-foreground mb-6">You haven't enrolled in any classes yet.</p>
+                      <Button 
+                        onClick={() => setActiveTab("upcoming")} 
+                        variant="outline"
+                      >
+                        Explore Classes
+                      </Button>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="host">
+                  {/* Host a Class Tab Content */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Host a Live Class</CardTitle>
+                      <CardDescription>Share your knowledge with students around the world</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <form className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="title">Title</Label>
+                            <Input id="title" placeholder="Class title" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="category">Category</Label>
+                            <Select>
+                              <SelectTrigger id="category">
+                                <SelectValue placeholder="Select a category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Islamic Law">Islamic Law</SelectItem>
+                                <SelectItem value="Arts">Arts</SelectItem>
+                                <SelectItem value="Quran Studies">Quran Studies</SelectItem>
+                                <SelectItem value="Finance">Finance</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="date">Date</Label>
+                            <Input id="date" type="date" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="time">Time</Label>
+                            <Input id="time" type="time" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="duration">Duration</Label>
+                            <Select>
+                              <SelectTrigger id="duration">
+                                <SelectValue placeholder="Select duration" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="30min">30 minutes</SelectItem>
+                                <SelectItem value="1hour">1 hour</SelectItem>
+                                <SelectItem value="1.5hours">1.5 hours</SelectItem>
+                                <SelectItem value="2hours">2 hours</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="maxAttendees">Max Attendees</Label>
+                            <Input id="maxAttendees" type="number" placeholder="e.g., 30" />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="description">Description</Label>
+                          <Textarea 
+                            id="description" 
+                            placeholder="Describe what students will learn in this class" 
+                            rows={4}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Class Topics</Label>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Input placeholder="Topic 1" />
+                            <Input placeholder="Topic 2" />
+                            <Input placeholder="Topic 3" />
+                            <Input placeholder="Topic 4" />
+                          </div>
+                        </div>
+                      </form>
+                    </CardContent>
+                    <CardFooter className="flex justify-end">
+                      <Button 
+                        onClick={handleHostClass}
+                        className="bg-brand-yellow hover:bg-yellow-500 text-brand-dark"
+                      >
+                        Schedule Class
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </TabsContent>
+              </>
+            ) : (
+              /* Live Class Interface - Shown when isInClass is true */
+              <div className="py-8">
                 <div className="container-custom">
                   <div className="mb-6 flex justify-between items-center">
                     <div>
@@ -636,147 +849,235 @@ const LiveClassPage = () => {
                                   <TooltipContent>
                                     {isAudioOn ? "Turn off microphone (M)" : "Turn on microphone (M)"}
                                   </TooltipContent>
-                                </TooltipProvider>
-                                
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button 
-                                        size="sm" 
-                                        variant={isVideoOn ? "default" : "outline"}
-                                        className={isVideoOn ? "bg-brand-yellow text-brand-dark hover:bg-yellow-500" : ""}
-                                        onClick={() => setIsVideoOn(!isVideoOn)}
-                                      >
-                                        {isVideoOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      {isVideoOn ? "Turn off camera (V)" : "Turn on camera (V)"}
-                                    </TooltipContent>
-                                  </TooltipProvider>
-                                  
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button 
-                                          size="sm" 
-                                          variant={isScreenSharing ? "default" : "outline"}
-                                          className={isScreenSharing ? "bg-brand-yellow text-brand-dark hover:bg-yellow-500" : ""}
-                                          onClick={() => setIsScreenSharing(!isScreenSharing)}
-                                        >
-                                          <Share className="h-4 w-4" />
-                                          <span className="ml-1 hidden sm:inline">{isScreenSharing ? "Stop" : "Share"}</span>
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        {isScreenSharing ? "Stop sharing screen" : "Share your screen"}
-                                      </TooltipContent>
-                                    </TooltipProvider>
-                                    
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button 
-                                            size="sm" 
-                                            variant={isHandRaised ? "default" : "outline"}
-                                            className={isHandRaised ? "bg-brand-yellow text-brand-dark hover:bg-yellow-500" : ""}
-                                            onClick={handleRaiseHand}
-                                          >
-                                            <HandRaised className="h-4 w-4" />
-                                            <span className="ml-1 hidden md:inline">{isHandRaised ? "Lower" : "Raise"}</span>
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          {isHandRaised ? "Lower your hand (H)" : "Raise your hand (H)"}
-                                        </TooltipContent>
-                                      </TooltipProvider>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-3">
-                                      <TooltipProvider>
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <Button 
-                                              size="sm" 
-                                              variant="outline"
-                                              onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
-                                            >
-                                              <Users className="h-4 w-4" />
-                                              <span className="ml-1 hidden md:inline">Participants</span>
-                                            </Button>
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            {isParticipantsOpen ? "Hide participants" : "Show participants"}
-                                          </TooltipContent>
-                                        </TooltipProvider>
-                                        
-                                        <TooltipProvider>
-                                          <Tooltip>
-                                            <TooltipTrigger asChild>
-                                              <Button 
-                                                size="sm" 
-                                                variant="outline"
-                                                onClick={() => setIsChatOpen(!isChatOpen)}
-                                              >
-                                                <MessageSquare className="h-4 w-4" />
-                                                <span className="ml-1 hidden md:inline">Chat</span>
-                                              </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              {isChatOpen ? "Hide chat" : "Show chat"}
-                                            </TooltipContent>
-                                          </TooltipProvider>
-                                          
-                                          <span className="text-white text-sm bg-red-500/80 px-2 py-1 rounded-md">Live</span>
-                                        </div>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant={isVideoOn ? "default" : "outline"}
+                                      className={isVideoOn ? "bg-brand-yellow text-brand-dark hover:bg-yellow-500" : ""}
+                                      onClick={() => setIsVideoOn(!isVideoOn)}
+                                    >
+                                      {isVideoOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {isVideoOn ? "Turn off camera (V)" : "Turn on camera (V)"}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant={isScreenSharing ? "default" : "outline"}
+                                      className={isScreenSharing ? "bg-brand-yellow text-brand-dark hover:bg-yellow-500" : ""}
+                                      onClick={() => setIsScreenSharing(!isScreenSharing)}
+                                    >
+                                      <Share className="h-4 w-4" />
+                                      <span className="ml-1 hidden sm:inline">{isScreenSharing ? "Stop" : "Share"}</span>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {isScreenSharing ? "Stop sharing screen" : "Share your screen"}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant={isHandRaised ? "default" : "outline"}
+                                      className={isHandRaised ? "bg-brand-yellow text-brand-dark hover:bg-yellow-500" : ""}
+                                      onClick={handleRaiseHand}
+                                    >
+                                      <HandRaised className="h-4 w-4" />
+                                      <span className="ml-1 hidden md:inline">{isHandRaised ? "Lower" : "Raise"}</span>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {isHandRaised ? "Lower your hand (H)" : "Raise your hand (H)"}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                            
+                            <div className="flex items-center gap-3">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
+                                    >
+                                      <Users className="h-4 w-4" />
+                                      <span className="ml-1 hidden md:inline">Participants</span>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {isParticipantsOpen ? "Hide participants" : "Show participants"}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => setIsChatOpen(!isChatOpen)}
+                                    >
+                                      <MessageSquare className="h-4 w-4" />
+                                      <span className="ml-1 hidden md:inline">Chat</span>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {isChatOpen ? "Hide chat" : "Show chat"}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <span className="text-white text-sm bg-red-500/80 px-2 py-1 rounded-md">Live</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                      
+                      <div className="flex flex-col md:flex-row gap-6">
+                        {/* Class Info */}
+                        <Card className="flex-1">
+                          <CardHeader>
+                            <CardTitle>About This Class</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground mb-4">{currentClass.description}</p>
+                            <h4 className="font-medium mb-2">Topics</h4>
+                            <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                              {currentClass.topics.map((topic, index) => (
+                                <li key={index}>{topic}</li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                        
+                        {/* Participants List (Shown when isParticipantsOpen is true) */}
+                        {isParticipantsOpen && (
+                          <Card className="flex-1">
+                            <CardHeader>
+                              <CardTitle className="flex items-center justify-between">
+                                <span>Participants ({participants.length})</span>
+                                <Button variant="ghost" size="sm" onClick={() => setIsParticipantsOpen(false)}>
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <ScrollArea className="h-[220px] pr-4">
+                                <div className="space-y-2">
+                                  {participants.map(participant => (
+                                    <div key={participant.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                                      <div className="flex items-center gap-2">
+                                        <Avatar className="h-8 w-8">
+                                          <AvatarImage src={participant.avatar} alt={participant.name} />
+                                          <AvatarFallback className="bg-brand-yellow/20 text-brand-yellow">
+                                            {participant.name.charAt(0)}
+                                          </AvatarFallback>
+                                        </Avatar>
+                                        <span className="font-medium">
+                                          {participant.name}
+                                          {participant.id === "1" && <span className="ml-2 text-xs bg-brand-yellow/20 text-brand-yellow px-1.5 py-0.5 rounded-full">Host</span>}
+                                        </span>
+                                      </div>
+                                      <div className="flex gap-1.5">
+                                        {!participant.isAudioOn && <MicOff className="h-4 w-4 text-muted-foreground" />}
+                                        {!participant.isVideoOn && <VideoOff className="h-4 w-4 text-muted-foreground" />}
+                                        {participant.isScreenSharing && <Share className="h-4 w-4 text-brand-yellow" />}
+                                        {participant.isHandRaised && <HandRaised className="h-4 w-4 text-brand-yellow" />}
                                       </div>
                                     </div>
-                                  </Card>
-                                  
-                                  <div className="flex flex-col md:flex-row gap-6">
-                                    {/* Class Info */}
-                                    <Card className="flex-1">
-                                      <CardHeader>
-                                        <CardTitle>About This Class</CardTitle>
-                                      </CardHeader>
-                                      <CardContent>
-                                        <p className="text-sm text-muted-foreground mb-4">{currentClass.description}</p>
-                                        <h4 className="font-medium mb-2">Topics</h4>
-                                        <ul className="list-disc pl-5 text-sm text-muted-foreground">
-                                          {currentClass.topics.map((topic, index) => (
-                                            <li key={index}>{topic}</li>
-                                          ))}
-                                        </ul>
-                                      </CardContent>
-                                    </Card>
-                                    
-                                    {/* Participants List (Shown when isParticipantsOpen is true) */}
-                                    {isParticipantsOpen && (
-                                      <Card className="flex-1">
-                                        <CardHeader>
-                                          <CardTitle className="flex items-center justify-between">
-                                            <span>Participants ({participants.length})</span>
-                                            <Button variant="ghost" size="sm" onClick={() => setIsParticipantsOpen(false)}>
-                                              <X className="h-4 w-4" />
-                                            </Button>
-                                          </CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                          <ScrollArea className="h-[220px] pr-4">
-                                            <div className="space-y-2">
-                                              {participants.map(participant => (
-                                                <div key={participant.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
-                                                  <div className="flex items-center gap-2">
-                                                    <Avatar className="h-8 w-8">
-                                                      <AvatarImage src={participant.avatar} alt={participant.name} />
-                                                      <AvatarFallback className="bg-brand-yellow/20 text-brand-yellow">
-                                                        {participant.name.charAt(0)}
-                                                      </AvatarFallback>
-                                                    </Avatar>
-                                                    <span className="font-medium">
-                                                      {participant.name}
-                                                      {participant.id === "1" && <span className="ml-2 text-xs bg-brand-yellow/20 text-brand-yellow px-1.5 py-0.5 rounded-full">Host</span>}
-                                                    </span>
-                                                  </div>
-                                                  <div className="flex gap-1.5">
-                                                    {!participant.isAudioOn && <MicOff className="h-4 w-4 text-muted-foreground" />}
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Chat Area */}
+                    {isChatOpen && (
+                      <div className="lg:col-span-1">
+                        <Card className="h-full flex flex-col">
+                          <CardHeader>
+                            <CardTitle className="flex items-center justify-between">
+                              <span>Chat</span>
+                              <Button variant="ghost" size="sm" onClick={() => setIsChatOpen(false)}>
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="flex-1 overflow-hidden">
+                            <ScrollArea className="h-[400px] pr-4">
+                              <div className="space-y-4">
+                                {chatMessages.map((message) => (
+                                  <div 
+                                    key={message.id} 
+                                    className={`flex ${message.isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                                  >
+                                    <div className={`max-w-[80%] ${message.isCurrentUser ? 'bg-brand-yellow/10 text-brand-dark' : 'bg-muted'} rounded-lg p-3`}>
+                                      {!message.isCurrentUser && (
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <Avatar className="h-6 w-6">
+                                            <AvatarImage src={message.user.avatar} alt={message.user.name} />
+                                            <AvatarFallback className="bg-brand-yellow/20 text-brand-yellow text-xs">
+                                              {message.user.name.charAt(0)}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <span className="text-xs font-medium">{message.user.name}</span>
+                                        </div>
+                                      )}
+                                      <p className="text-sm">{message.message}</p>
+                                      <div className="mt-1 text-right">
+                                        <span className="text-xs text-muted-foreground">{message.timestamp}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </ScrollArea>
+                          </CardContent>
+                          <div className="p-4 border-t">
+                            <form onSubmit={handleSendMessage} className="flex gap-2">
+                              <Input 
+                                placeholder="Type your message..." 
+                                value={chatMessage} 
+                                onChange={(e) => setChatMessage(e.target.value)} 
+                                className="flex-1"
+                              />
+                              <Button type="submit" size="sm">Send</Button>
+                            </form>
+                          </div>
+                        </Card>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </Tabs>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default LiveClassPage;
